@@ -4,14 +4,13 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
-class Link(models.Model):
-    link_url = models.CharField(max_length=200)
-    link_title = models.CharField(max_length=200,null=True, blank=True)
-    link_icon = models.CharField(max_length=200,null=True, blank=True)
 
 class Laboratory(models.Model):
     laboratory_title = models.CharField(max_length=200,null=True, blank=True)
     laboratory_icon = models.CharField(max_length=200,null=True, blank=True)
+
+    class Meta:
+        verbose_name_plural = "Laberatories"
 
 class Collegiate(models.Model):
     full_name = models.CharField(max_length=200)
@@ -25,7 +24,6 @@ class Collegiate(models.Model):
     create_date = models.DateTimeField('date created')
 
     #Relations
-    links= models.ManyToManyField(Link, blank=True)
     laboratories= models.ManyToManyField(Laboratory, blank=True) #list of labs collegiate attends.
 
     def __str__(self):
@@ -43,7 +41,7 @@ class Expertise(models.Model):
         return self.title
 
 class Institute(models.Model):
-    InstituteName = models.CharField(max_length=200)
+    InstituteName = models.CharField(max_length=200 , unique=True)
     InstituteAddress = models.CharField(max_length=200,null=True, blank=True)
 
     #Relations
@@ -52,3 +50,15 @@ class Institute(models.Model):
 
     def __str__(self):
         return self.InstituteName
+
+
+class Link(models.Model):
+    link_url = models.URLField()
+    link_title = models.CharField(max_length=200, null=True, blank=True)
+    link_icon = models.CharField(max_length=200, null=True, blank=True)
+
+    # Relations
+    owner = models.ForeignKey(Collegiate, on_delete=models.CASCADE , null=True)
+
+    def __str__(self):
+        return self.link_title+" of "+self.owner.name

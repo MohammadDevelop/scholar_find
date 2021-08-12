@@ -8,7 +8,8 @@ from .serializers import CollegiateSerializer , ExpertiseSerializer
 
 
 def index(request):
-    return HttpResponse("Sch Find API under debugging!")
+    context_dict={'page_title':'Main Page for Scholar Find Project !!!!'}
+    return render(request,'schrest/index.html',context=context_dict)
 
 @api_view(['GET'])
 def collegiate_head(request):
