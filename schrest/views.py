@@ -5,8 +5,6 @@ from rest_framework.response import Response
 from .models import Collegiate, Expertise , Institute
 from .serializers import CollegiateSerializer , ExpertiseSerializer
 
-
-
 def index(request):
     context_dict={'page_title':'Main Page for Scholar Find Project !!!!'}
     return render(request,'schrest/index.html',context=context_dict)
@@ -43,6 +41,18 @@ def collegiate_detail(request,pk):
         collegiate = Collegiate.objects.get(id=pk)
         serializer = CollegiateSerializer(collegiate, many=False)
         return Response(serializer.data)
+
+@api_view(['GET'])
+def show_collegiate_detail(request,pk):
+    """
+    :param request: ID
+    :return: all detail of Collegiate by ID.
+    """
+    if request.method == 'GET':
+        collegiate = Collegiate.objects.get(id=pk)
+        context_dict={"detail":collegiate , "expertises":collegiate.expertise_set.all() , "institutes":collegiate.institute_set.all()}
+        return render(request,'schrest/collegiate_detail.html',context=context_dict)
+
 
 @api_view(['GET'])
 def expertise_collegiates(request,pk):

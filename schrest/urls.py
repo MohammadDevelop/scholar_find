@@ -11,6 +11,7 @@ urlpatterns = [
     path('collegiate_head', views.collegiate_head, name='collegiate_head'),
     path('collegiate_detail/<str:pk>', views.collegiate_detail, name='collegiate_detail'),
     path('collegiate_expertises/<str:pk>', views.collegiate_expertises, name='collegiate_expertises'),
+    path('portal/collegiate_detail/<str:pk>', views.show_collegiate_detail, name='show_collegiate_detail'),
 
     #expertise
     path('expertise_head', views.expertise_head, name='expertise_head'),
