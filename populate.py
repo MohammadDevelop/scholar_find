@@ -11,8 +11,14 @@ from django.utils import timezone
 import requests
 from bs4 import BeautifulSoup
 import re
+import nltk
 
-base="https://aa.stanford.edu"
+from nltk.parse.corenlp import CoreNLPDependencyParser
+
+all_expertises = Expertise.objects.all()
+print(len(all_expertises))
+
+base="https://sala.ubc.ca"
 link = base+"/people/faculty"
 f = requests.get(link)
 print(link)
@@ -26,7 +32,7 @@ def cleanhtml(raw_html):
   cleantext = re.sub(cleanr, '', raw_html)
   return cleantext
 
-all_rows=BeautifulSoup(f.text, "lxml").find_all(attrs={"class": "views-row"})
+all_rows=BeautifulSoup(f.text, "lxml").find_all(attrs={"class": "salacol-xs-3"})
 
 all_people=[]
 for row in all_rows:
@@ -40,10 +46,11 @@ for plink in all_people:
     print(base+plink)
     read_single = requests.get(base + plink)
 
+#Capture Name
     try:
-        sp=BeautifulSoup(read_single.text, "lxml").find_all(attrs={"class": "su-person-name"})
-        name = cleanhtml(str(sp[0].find('h1')))
-        print(name)
+        sp=BeautifulSoup(read_single.text, "lxml").find_all(attrs={"class": "page-header"})
+        name = cleanhtml(str(sp[0]))
+        print("Name Captured: "+name)
         if len(name.split(" "))==2:
             first_name=name.split(" ")[0]
             last_name=name.split(" ")[1]
@@ -54,24 +61,28 @@ for plink in all_people:
             last_name = name.split(" ")[2]
     except Exception as e:
         first_name=last_name=name=""
-        print(str(e))
+        print("Name: "+str(e))
+
+    # try:
+    #     sp=BeautifulSoup(read_single.text, "lxml").find_all(attrs={"class": "su-person-email"})
+    #     email = cleanhtml(str(sp[0].find('a')))
+    #     print(email)
+    # except Exception as e:
+    #     email=""
+    #     print("Email: "+str(e))
 
     try:
-        sp=BeautifulSoup(read_single.text, "lxml").find_all(attrs={"class": "su-person-email"})
-        email = cleanhtml(str(sp[0].find('a')))
-        print(email)
-    except Exception as e:
-        email=""
-        print(str(e))
-
-    try:
-        sp=BeautifulSoup(read_single.text, "lxml").find_all(attrs={"class": "su-person-links"})
+        sp=BeautifulSoup(read_single.text, "lxml").find_all(attrs={"class": "block-system"})
         #print(sp[0].find('a').split('"')[1])
-        site = cleanhtml(str(sp[0].find('a')).split('"')[1])
+        site = cleanhtml(str(sp[0].find_all('h5')))
+        site2 = cleanhtml(str(sp[0].find_all('p')))
         print(site)
+        print(site2)
+        position=site2[0]
+
     except Exception as e:
         site=""
-        print(str(e))
+        print("Site: "+str(e))
 
     try:
         sp=BeautifulSoup(read_single.text, "lxml").find_all(attrs={"class": "node-stanford-person-su-person-full-title"})
@@ -82,7 +93,7 @@ for plink in all_people:
     except Exception as e:
         position=""
         of_str=""
-        print(str(e))
+        print("Faculty: "+str(e))
 
     try:
         sp=BeautifulSoup(read_single.text, "lxml").find_all(attrs={"class": "field-block node-stanford-person-su-person-mobile-phone block-layout-builder"})
@@ -90,7 +101,7 @@ for plink in all_people:
         print(phone)
     except Exception as e:
         phone=""
-        print(str(e))
+        print("Phone: "+str(e))
 
     try:
         sp=BeautifulSoup(read_single.text, "lxml").find_all(attrs={"class": "su-person-education"})
@@ -98,21 +109,38 @@ for plink in all_people:
         print(edu)
     except Exception as e:
         edu=""
-        print(str(e))
+        print("Educations: "+str(e))
 
     try:
-        clg= Collegiate.objects.get_or_create(full_name=name.strip() , create_date = timezone.now())[0]
-        clg.position = position.strip()
-        clg.faculty = of_str.strip()
-        clg.phone_number = phone.strip()
-        clg.email = email.strip()
-        clg.bio = edu.strip()
-        clg.save()
-
-        ins = Institute.objects.get_or_create(InstituteName=uni)[0]
-        ins.collegiates.add(clg)
-        ins.save()
-
+        sp=BeautifulSoup(read_single.text, "lxml").find_all(attrs={"class": "su-person-body"})
+        desc=cleanhtml(str(sp[0]))
     except Exception as e:
-        print("Insertion: " + str(e))
+        desc=""
+        print("Desciption: "+str(e))
 
+
+
+    # try:
+    #     clg= Collegiate.objects.get_or_create(full_name=name.strip() , create_date = timezone.now())[0]
+    #     clg.position = position.strip()
+    #     clg.faculty = of_str.strip()
+    #     clg.phone_number = phone.strip()
+    #     clg.email = email.strip()
+    #     clg.bio = desc.strip()
+    #     clg.educations= edu.strip()
+    #     clg.main_page= site.strip()
+    #     clg.save()
+    #
+    #     ins = Institute.objects.get_or_create(InstituteName=uni)[0]
+    #     ins.collegiates.add(clg)
+    #     ins.save()
+    #
+    #     for exp in all_expertises:
+    #         if exp.title.lower() in desc.lower():
+    #             print("-"*5+" add "+exp.title.lower()+" to "+clg.full_name)
+    #             exp.collegiates.add(clg)
+    #             exp.save()
+    #
+    # except Exception as e:
+    #     print("Insertion: " + str(e))
+    #

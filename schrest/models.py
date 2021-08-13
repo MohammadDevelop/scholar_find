@@ -13,14 +13,16 @@ class Laboratory(models.Model):
         verbose_name_plural = "Laberatories"
 
 class Collegiate(models.Model):
-    full_name = models.CharField(max_length=200)
+    full_name = models.CharField(max_length=200 , unique=True)
     field = models.CharField(max_length=200,null=True, blank=True)
     email = models.CharField(max_length=200,null=True, blank=True)
     faculty = models.CharField(max_length=200,null=True, blank=True)
     position = models.CharField(max_length=200,null=True, blank=True)
     phone_number = models.CharField(max_length=200,null=True, blank=True)
     profile_picture = models.CharField(max_length=200,null=True, blank=True)
-    bio = models.TextField()
+    bio = models.TextField(null=True, blank=True)
+    educations = models.TextField(null=True, blank=True)
+    main_page = models.URLField(null=True, blank=True)
     create_date = models.DateTimeField('date created')
 
     #Relations
@@ -31,7 +33,7 @@ class Collegiate(models.Model):
 
 
 class Expertise(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, unique=True)
     link = models.CharField(max_length=200,null=True, blank=True)
 
     #Relations

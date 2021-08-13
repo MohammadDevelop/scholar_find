@@ -13,6 +13,7 @@ urlpatterns = [
     path('collegiate_expertises/<str:pk>', views.collegiate_expertises, name='collegiate_expertises'),
 
     #expertise
+    path('expertise_head', views.expertise_head, name='expertise_head'),
     path('expertise_collegiates/<str:pk>', views.expertise_collegiates, name='expertise_collegiates'),
 
     #institute

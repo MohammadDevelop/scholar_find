@@ -15,11 +15,22 @@ def index(request):
 def collegiate_head(request):
     """
     :param request: None
-    :return: top 5 rows of Collegiate table.
+    :return: top 5 rows of Collegiate table. (last inserted)
     """
     if request.method == 'GET':
-        collegiates = Collegiate.objects.all()[:5]
+        collegiates = Collegiate.objects.all().order_by('-create_date')[:5]
         serializer = CollegiateSerializer(collegiates, many=True)
+        return Response(serializer.data)
+
+@api_view(['GET'])
+def expertise_head(request):
+    """
+    :param request: None
+    :return: top 5 rows of Collegiate table. (last inserted)
+    """
+    if request.method == 'GET':
+        expertises = Expertise.objects.all().order_by('-id')[:10]
+        serializer = ExpertiseSerializer(expertises, many=True)
         return Response(serializer.data)
 
 @api_view(['GET'])
