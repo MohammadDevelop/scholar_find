@@ -21,16 +21,13 @@ def cleanhtml(raw_html):
   cleantext = re.sub(cleanr, '', raw_html)
   return cleantext
 
-all_rows=BeautifulSoup(f.text, "lxml").find_all("li")
+all_expertises = Expertise.objects.all()
 
-
-for row in all_rows:
-    if not "\n" in str(row) and not cleanhtml(str(row))=='':
-        print(cleanhtml(str(row)))
-        try:
-            ex= Expertise.objects.get_or_create(title=cleanhtml(str(row)).strip())[0]
-            ex.save()
-
-        except Exception as e:
-            print("Insertion: " + str(e))
-
+for x in all_expertises:
+    if len(str(x.title).lower().strip().split(" ")) >7:
+        x.delete()
+        print(x.title+" deleted!")
+    # if str(x.title)[0] ==' ':
+    #     x.title=x.title.strip()
+    #     x.save()
+    #     print(x.title+" modified!")

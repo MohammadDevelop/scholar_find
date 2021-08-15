@@ -19,7 +19,7 @@ class Collegiate(models.Model):
     faculty = models.CharField(max_length=200,null=True, blank=True)
     position = models.CharField(max_length=200,null=True, blank=True)
     phone_number = models.CharField(max_length=200,null=True, blank=True)
-    profile_picture = models.URLField(null=True, blank=True)
+    profile_picture = models.CharField(max_length=500, null=True, blank=True, default="/static/images/scholar.png")
     bio = models.TextField(null=True, blank=True)
     educations = models.TextField(null=True, blank=True)
     main_page = models.URLField(null=True, blank=True)

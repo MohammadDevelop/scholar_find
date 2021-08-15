@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.shortcuts import render
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
@@ -6,7 +7,11 @@ from .models import Collegiate, Expertise , Institute
 from .serializers import CollegiateSerializer , ExpertiseSerializer
 
 def index(request):
-    context_dict={'page_title':'Main Page for Scholar Find Project !!!!'}
+    expertises = Expertise.objects.annotate(c=Count('collegiates')).filter(c__gt=5).order_by('?')[:4]
+    collegiates = Collegiate.objects.all().order_by('?')[:8]
+    collegiates2 = Collegiate.objects.all().order_by('?')[0]
+
+    context_dict={'page_title':'AcaTheme Project',"random_expertises":expertises , "random_collegiates":collegiates ,"featured":collegiates2}
     return render(request,'schrest/index.html',context=context_dict)
 
 @api_view(['GET'])
@@ -52,6 +57,18 @@ def show_collegiate_detail(request,pk):
         collegiate = Collegiate.objects.get(id=pk)
         context_dict={"detail":collegiate , "expertises":collegiate.expertise_set.all() , "institutes":collegiate.institute_set.all()}
         return render(request,'schrest/collegiate_detail.html',context=context_dict)
+
+@api_view(['GET'])
+def show_expertise_detail(request,pk):
+    """
+    :param request: ID
+    :return: all detail of Expertise by ID.
+    """
+    if request.method == 'GET':
+        expertise = Expertise.objects.get(id=pk)
+        context_dict={"detail":expertise }
+        print(context_dict)
+        return render(request,'schrest/expertise_detail.html',context=context_dict)
 
 
 @api_view(['GET'])
